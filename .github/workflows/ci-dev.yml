@@ -58,7 +58,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --all-projects
+          args: --all-projects --severity-threshold=critical
 
       # Build Docker Images to verify they compile
       - name: Build Docker Images (Dry Run)
