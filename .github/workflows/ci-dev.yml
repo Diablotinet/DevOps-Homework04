@@ -60,6 +60,7 @@ jobs:
         with:
           args: --all-projects --severity-threshold=critical
 
-      # Build Docker Images to verify they compile
+        # Build Docker Images to verify they compile
       - name: Build Docker Images (Dry Run)
-        run: docker-compose build
+        working-directory: ./ci-cd-pipeline
+        run: docker compose build
