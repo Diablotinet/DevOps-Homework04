@@ -21,7 +21,7 @@ jobs:
       # Frontend Checks
       - name: Install Frontend Dependencies
         working-directory: ./ci-cd-pipeline/frontend
-        run: npm ci
+        run: npm install
 
       - name: Run Frontend Linting
         working-directory: ./ci-cd-pipeline/frontend
@@ -38,7 +38,7 @@ jobs:
       # Backend Checks
       - name: Install Backend Dependencies
         working-directory: ./ci-cd-pipeline/backend
-        run: npm ci
+        run: npm install
 
       - name: Run Backend Linting
         working-directory: ./ci-cd-pipeline/backend
