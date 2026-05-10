@@ -46,7 +46,7 @@ jobs:
 
       - name: Run Backend npm audit
         working-directory: ./ci-cd-pipeline/backend
-        run: npm audit
+        run: npm audit --audit-level=critical
 
       - name: Run Backend Tests
         working-directory: ./ci-cd-pipeline/backend
