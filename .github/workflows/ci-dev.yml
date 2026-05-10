@@ -29,7 +29,7 @@ jobs:
 
       - name: Run Frontend npm audit
         working-directory: ./ci-cd-pipeline/frontend
-        run: npm audit
+        run: npm audit --audit-level=critical
 
       - name: Run Frontend Tests
         working-directory: ./ci-cd-pipeline/frontend
