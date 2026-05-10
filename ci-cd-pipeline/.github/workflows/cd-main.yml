@@ -1,0 +1,72 @@
+name: CD Pipeline (main)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Set variables for versioning
+      - name: Generate image tags
+        id: image-tags
+        run: |
+          echo "version=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "timestamp=$(date +%Y%m%d_%H%M%S)" >> $GITHUB_OUTPUT
+
+      # Inject Secrets by creating .env file for the backend
+      - name: Create .env file for Backend from GitHub Secrets
+        working-directory: ./backend
+        run: |
+          echo "DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }}" >> .env
+          echo "API_KEY=${{ secrets.API_KEY }}" >> .env
+          echo "NODE_ENV=production" >> .env
+          echo "APP_SECRET_NAME=${{ secrets.APP_SECRET_NAME }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "API_SECRET_KEY=${{ secrets.API_SECRET_KEY }}" >> .env
+
+      # Inject Secrets by creating .env file for the frontend (if needed)
+      - name: Create .env file for Frontend from GitHub Secrets
+        working-directory: ./frontend
+        run: |
+          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
+          echo "NODE_ENV=production" >> .env
+
+      - name: Build and Push Backend Image
+        working-directory: ./backend
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:latest \
+                       -t ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:${{ steps.image-tags.outputs.version }} .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:${{ steps.image-tags.outputs.version }}
+
+      - name: Build and Push Frontend Image
+        working-directory: ./frontend
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/node-frontend:latest \
+                       -t ${{ secrets.DOCKERHUB_USERNAME }}/node-frontend:${{ steps.image-tags.outputs.version }} .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/node-frontend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/node-frontend:${{ steps.image-tags.outputs.version }}
+
+      - name: Deployment Summary
+        run: |
+          echo "✅ Production deployment completed successfully!"
+          echo "Backend Image: ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:latest"
+          echo "Backend Image: ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:${{ steps.image-tags.outputs.version }}"
+          echo "Frontend Image: ${{ secrets.DOCKERHUB_USERNAME }}/node-frontend:latest"
+          echo "Frontend Image: ${{ secrets.DOCKERHUB_USERNAME }}/node-frontend:${{ steps.image-tags.outputs.version }}"
