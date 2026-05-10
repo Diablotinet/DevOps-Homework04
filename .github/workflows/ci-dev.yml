@@ -20,36 +20,36 @@ jobs:
 
       # Frontend Checks
       - name: Install Frontend Dependencies
-        working-directory: ./frontend
+        working-directory: ./ci-cd-pipeline/frontend
         run: npm ci
 
       - name: Run Frontend Linting
-        working-directory: ./frontend
+        working-directory: ./ci-cd-pipeline/frontend
         run: npm run lint
 
       - name: Run Frontend npm audit
-        working-directory: ./frontend
+        working-directory: ./ci-cd-pipeline/frontend
         run: npm audit
 
       - name: Run Frontend Tests
-        working-directory: ./frontend
+        working-directory: ./ci-cd-pipeline/frontend
         run: npm test -- --watchAll=false --passWithNoTests
 
       # Backend Checks
       - name: Install Backend Dependencies
-        working-directory: ./backend
+        working-directory: ./ci-cd-pipeline/backend
         run: npm ci
 
       - name: Run Backend Linting
-        working-directory: ./backend
+        working-directory: ./ci-cd-pipeline/backend
         run: npm run lint
 
       - name: Run Backend npm audit
-        working-directory: ./backend
+        working-directory: ./ci-cd-pipeline/backend
         run: npm audit
 
       - name: Run Backend Tests
-        working-directory: ./backend
+        working-directory: ./ci-cd-pipeline/backend
         run: npm test
 
       # Security Analysis

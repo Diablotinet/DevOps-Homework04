@@ -31,7 +31,7 @@ jobs:
 
       # Inject Secrets by creating .env file for the backend
       - name: Create .env file for Backend from GitHub Secrets
-        working-directory: ./backend
+        working-directory: ./ci-cd-pipeline/backend
         run: |
           echo "DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }}" >> .env
           echo "API_KEY=${{ secrets.API_KEY }}" >> .env
@@ -42,13 +42,13 @@ jobs:
 
       # Inject Secrets by creating .env file for the frontend (if needed)
       - name: Create .env file for Frontend from GitHub Secrets
-        working-directory: ./frontend
+        working-directory: ./ci-cd-pipeline/frontend
         run: |
           echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
           echo "NODE_ENV=production" >> .env
 
       - name: Build and Push Backend Image
-        working-directory: ./backend
+        working-directory: ./ci-cd-pipeline/backend
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:latest \
                        -t ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:${{ steps.image-tags.outputs.version }} .
@@ -56,7 +56,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/node-backend:${{ steps.image-tags.outputs.version }}
 
       - name: Build and Push Frontend Image
-        working-directory: ./frontend
+        working-directory: ./ci-cd-pipeline/frontend
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/node-frontend:latest \
                        -t ${{ secrets.DOCKERHUB_USERNAME }}/node-frontend:${{ steps.image-tags.outputs.version }} .
